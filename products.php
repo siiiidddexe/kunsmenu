@@ -151,7 +151,7 @@ if ($result === false) {
     </div>
 
 <div class="container">
-    <h1>Products</h1>
+    <h1>Browse Products</h1>
     <div class="products-container">
         <?php
         if ($result->num_rows > 0) {
@@ -188,7 +188,7 @@ if ($result === false) {
     function addToCart(productId) {
     var phoneNumber = "<?php echo $_SESSION['phone'] ?? ''; ?>";
     var quantity = document.getElementById('quantity' + productId).value; // Get the selected quantity
-        alert(quantity);   alert(productId);
+        //alert(quantity);   alert(productId);
     if (phoneNumber) {
         var xhr = new XMLHttpRequest();
         xhr.onreadystatechange = function () {
