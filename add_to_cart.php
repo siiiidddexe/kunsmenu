@@ -5,6 +5,10 @@ $phone = $_SESSION['phone'];
 // Start the session to access session variables
 echo "Client_Id:", " ", $phone;
 
+
+if (isset($_POST['quantity']) && isset($_POST['product_id'])) {
+    $quantity = $_POST['quantity'];
+}
 // Check if product_id and phone are provided
 if (isset($_GET['product_id']) && isset($_GET['phone'])) {
     // Connect to the database (update connection details as needed)
@@ -37,6 +41,10 @@ if (isset($_GET['product_id']) && isset($_GET['phone'])) {
             echo "Error adding product to cart: " . $conn->error;
         }
     }
+
+
+
+
 
     $conn->close();
 } else if (isset($_GET['remove_product_id'])) {

@@ -162,14 +162,25 @@ if ($result === false) {
                 echo "<p>Price: ₹" . $row["price"] . "</p>";
             
                 // Add input field for quantity
-  // Add input field for quantity
-                echo "<label for='quantity" . $row["id"] . "'>Quantity:</label>";
-                echo "<input type='number' id='quantity" . $row["id"] . "' name='quantity' value='1' min='1'>";
+ 
+                echo "      <form action='add_to_cart.php' method='POST'>";
+           
+                
+            
+                echo "    <label for='quantity'>Quantity:</label>";
+                echo "    <input type='number' id='quantity' name='quantity' value='1' min='1'>";
+            
+                echo "  <input type='submit' value='Add to Cart'>";
+                echo "  </form>";
+            
+
+       echo "    <form method='POST'><label for='quantity" . $row["id"] . "'>Quantity:</label>";
+                echo "<input type='number' id='quantity" . $row["id"] . "' name='quantity' value='1' min='1'>  </form>";
                 echo "</div>";
                 echo "<img src='" . $row["product_image"] . "' alt='Product Image'>";
                 
                 // Add a new button to trigger cart update
-                echo "<button  onclick='addToCart(" . $row["id"] . ")'>Add to Cart</button>";
+                echo "<button  method='POST' onclick='addToCart(" . $row["id"] . ")'>Add to Cart</button>";
                 echo "</div>";
             }
         } else {
@@ -188,7 +199,7 @@ if ($result === false) {
     function addToCart(productId) {
     var phoneNumber = "<?php echo $_SESSION['phone'] ?? ''; ?>";
     var quantity = document.getElementById('quantity' + productId).value; // Get the selected quantity
-        //alert(quantity);   alert(productId);
+        alert('quantity='+quantity);   alert('product_id='+productId);
     if (phoneNumber) {
         var xhr = new XMLHttpRequest();
         xhr.onreadystatechange = function () {
