@@ -2,8 +2,24 @@
 session_start();
 $phone = $_SESSION['phone'];
 
+$quantity = " "; 
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $quantity = $_POST["quantity"];
+
+    
+}
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $quantity = $_POST["quantity"];
+    echo "Received quantity: " . $quantity;
+} else {
+    echo "No data received";
+}
+echo "Received quantity: " . $quantity;
 // Start the session to access session variables
 echo "Client_Id:", " ", $phone;
+echo "QUANTITY:", " ", $quantity;
+
+
 
 
 if (isset($_POST['quantity']) && isset($_POST['product_id'])) {
@@ -27,6 +43,7 @@ if (isset($_GET['product_id']) && isset($_GET['phone'])) {
     $phone_number = $_GET['phone'];
 
     // Check if the product is already in the cart for the user
+    // Check if the product is already in the cart for the user
     $check_sql = "SELECT * FROM cart WHERE product_id = $product_id AND phone_number = '$phone_number'";
     $check_result = $conn->query($check_sql);
 
@@ -34,7 +51,8 @@ if (isset($_GET['product_id']) && isset($_GET['phone'])) {
         echo "Product already in cart.";
     } else {
         // Add the product to the cart
-        $insert_sql = "INSERT INTO cart (product_id, phone_number, quantity) VALUES ($product_id, '$phone_number', 1)";
+        $insert_sql = "INSERT INTO cart (product_id, phone_number, quantity) VALUES ($product_id, '$phone_number', '$quantity'  )";
+        echo "qty inserted".$quantity;
         if ($conn->query($insert_sql) === TRUE) {
             echo "Product added to cart successfully.";
         } else {
@@ -42,9 +60,7 @@ if (isset($_GET['product_id']) && isset($_GET['phone'])) {
         }
     }
 
-
-
-
+     echo "Received quantity: " . $quantity;
 
     $conn->close();
 } else if (isset($_GET['remove_product_id'])) {
@@ -72,21 +88,14 @@ if (isset($_GET['product_id']) && isset($_GET['phone'])) {
     }
 
     $conn->close();
-} else {
 }
 
 
 
 
 
-
-
-
-
-
-
-
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 

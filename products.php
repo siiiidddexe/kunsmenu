@@ -154,38 +154,30 @@ if ($result === false) {
     <h1>Browse Products</h1>
     <div class="products-container">
         <?php
-        if ($result->num_rows > 0) {
-            while ($row = $result->fetch_assoc()) {
-                echo "<div class='product'>";
-                echo "<div class='product-info'>";
-                echo "<h3>" . $row["product_name"] . "</h3>";
-                echo "<p>Price: ₹" . $row["price"] . "</p>";
-            
-                // Add input field for quantity
- 
-                echo "      <form action='add_to_cart.php' method='POST'>";
-           
-                
-            
-                echo "    <label for='quantity'>Quantity:</label>";
-                echo "    <input type='number' id='quantity' name='quantity' value='1' min='1'>";
-            
-                echo "  <input type='submit' value='Add to Cart'>";
-                echo "  </form>";
-            
+if ($result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        echo "<div class='product'>";
+        echo "<div class='product-info'>";
+        echo "<h3>" . $row["product_name"] . "</h3>";
+        echo "<p>Price: ₹" . $row["price"] . "</p>";
 
-       echo "    <form method='POST'><label for='quantity" . $row["id"] . "'>Quantity:</label>";
-                echo "<input type='number' id='quantity" . $row["id"] . "' name='quantity' value='1' min='1'>  </form>";
-                echo "</div>";
-                echo "<img src='" . $row["product_image"] . "' alt='Product Image'>";
-                
-                // Add a new button to trigger cart update
-                echo "<button  method='POST' onclick='addToCart(" . $row["id"] . ")'>Add to Cart</button>";
-                echo "</div>";
-            }
-        } else {
-            echo "<div class='empty-message'>No products available.</div>";
-        }
+        // Add input field for quantity
+        echo "<form id='form" . $row["id"] . "' action='add_to_cart.php' method='POST'>";
+        echo "<input type='hidden' name='productId' value='" . $row["id"] . "'>";
+        echo "<label for='quantity'>Quantity:</label>";
+        echo "<input type='number' id='quantity" . $row["id"] . "' name='quantity' value='1' min='1'>";
+
+        // Add a single button to trigger both actions
+        echo "<button type='button' onclick='addToCartWithQuantity(" . $row["id"] . ")'>Add to Cart</button>";
+        echo "</form>";
+
+        echo "</div>";
+        echo "<img src='" . $row["product_image"] . "' alt='Product Image'>";
+        echo "</div>";
+    }
+} else {
+    echo "<div class='empty-message'>No products available.</div>";
+}
         ?>
     </div>
 </div>
@@ -195,17 +187,24 @@ if ($result === false) {
 
 <script>
 
-    
-    function addToCart(productId) {
+function addToCartWithQuantity(productId) {
+    var quantity = document.getElementById('quantity' + productId).value; // Get the quantity
+
+    // Call addToCart function with productId and quantity
+    addToCart(productId, quantity);
+
+    // Submit the form
+    document.getElementById('form' + productId).submit();
+}
+
+function addToCart(productId, quantity) {
     var phoneNumber = "<?php echo $_SESSION['phone'] ?? ''; ?>";
-    var quantity = document.getElementById('quantity' + productId).value; // Get the selected quantity
-        alert('quantity='+quantity);   alert('product_id='+productId);
+
     if (phoneNumber) {
         var xhr = new XMLHttpRequest();
         xhr.onreadystatechange = function () {
             if (this.readyState === 4 && this.status === 200) {
                 alert("Added to cart");
-              
             }
         };
         // Send product ID, quantity, and phone number
