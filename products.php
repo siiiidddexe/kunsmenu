@@ -10,6 +10,11 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
+$quantity = ""; 
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $quantity = $_POST["quantity"];
+}
+
 if (isset($_POST['signout'])) {
     session_start(); // Start the session
     session_unset(); // Unset all session variables
@@ -18,21 +23,45 @@ if (isset($_POST['signout'])) {
     exit;
 }
 
+echo "QUANTITY:", " ", $quantity;
+
 // Check if phone number is not set in session, redirect to login
 if (!isset($_SESSION['phone'])) {
     header('Location: login.php');
     exit;
 }
 echo "Client_id:"," " , $_SESSION['phone'];
-// Fetch products from the database
-$sql = "SELECT * FROM products";
+
+// Fetch only available products from the database
+$sql = "SELECT * FROM products WHERE availability = 'available'";
 $result = $conn->query($sql);
 
 if ($result === false) {
     die("Error fetching products: " . $conn->error);
 }
 
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Connect to the database (update connection details as needed)
+    $conn = new mysqli($servername, $username, $password, $dbname);
+
+    if ($conn->connect_error) {
+        die("Connection failed: " . $conn->connect_error);
+    }
+
+    // Update payment status to "pending" for all records associated with the session phone
+    $update_sql = "UPDATE cart SET quantity = '$quantity' WHERE phone_number = '$phone'";
+    if ($conn->query($update_sql) === TRUE) {
+        echo "Payment status updated to 'pending' for all your ordered items.";
+    } else {
+        echo "Error updating payment status: " . $conn->error;
+    }
+
+    $conn->close();
+}
+
 ?>
+
 
 
 <!DOCTYPE html>
@@ -194,12 +223,12 @@ function addToCartWithQuantity(productId) {
     addToCart(productId, quantity);
 
     // Submit the form
-    document.getElementById('form' + productId).submit();
+    document.getElementById('form' + productId).submit(); 
 }
 
 function addToCart(productId, quantity) {
     var phoneNumber = "<?php echo $_SESSION['phone'] ?? ''; ?>";
-
+    var quantity = "<?php echo $_SESSION['phone'] ?? ''; ?>";
     if (phoneNumber) {
         var xhr = new XMLHttpRequest();
         xhr.onreadystatechange = function () {

@@ -22,11 +22,11 @@ echo "QUANTITY:", " ", $quantity;
 
 
 
-if (isset($_POST['quantity']) && isset($_POST['product_id'])) {
-    $quantity = $_POST['quantity'];
-}
+  //  if (isset($_POST['quantity']) && isset($_POST['product_id'])) {
+    //$quantity = $_POST['quantity'];
+    //}
 // Check if product_id and phone are provided
-if (isset($_GET['product_id']) && isset($_GET['phone'])) {
+if (isset($_GET['product_id']) && isset($_GET['phone'])  && isset($_GET['phone']) ) {
     // Connect to the database (update connection details as needed)
     $servername = "localhost";
     $username = "root";
@@ -51,8 +51,8 @@ if (isset($_GET['product_id']) && isset($_GET['phone'])) {
         echo "Product already in cart.";
     } else {
         // Add the product to the cart
-        $insert_sql = "INSERT INTO cart (product_id, phone_number, quantity) VALUES ($product_id, '$phone_number', '$quantity'  )";
-        echo "qty inserted".$quantity;
+        $insert_sql = "INSERT INTO cart (product_id, phone_number, quantity) VALUES ($product_id, '$phone_number', '$quantity' )";
+
         if ($conn->query($insert_sql) === TRUE) {
             echo "Product added to cart successfully.";
         } else {
@@ -227,14 +227,58 @@ if (isset($_GET['product_id']) && isset($_GET['phone'])) {
             } else {
                 echo "<div class='not-logged-in'>Please log in to view your cart.</div>";
             }
+
+            if ($_SERVER["REQUEST_METHOD"] == "POST") {
+                // Connect to the database (update connection details as needed)
+                $conn = new mysqli($servername, $username, $password, $dbname);
+            
+                if ($conn->connect_error) {
+                    die("Connection failed: " . $conn->connect_error);
+                }
+            
+                // Update payment status to "pending" for all records associated with the session phone
+                $update_sql = "UPDATE cart SET payment = 'pending' WHERE phone_number = '$phone'";
+                if ($conn->query($update_sql) === TRUE) {
+                    echo "Payment status updated to 'pending' for all your ordered items.";
+                } else {
+                    echo "Error updating payment status: " . $conn->error;
+                }
+            
+                $conn->close();
+            }
+
+
+            if ($_SERVER["REQUEST_METHOD"] == "POST") {
+                // Connect to the database (update connection details as needed)
+                $conn = new mysqli($servername, $username, $password, $dbname);
+            
+                if ($conn->connect_error) {
+                    die("Connection failed: " . $conn->connect_error);
+                }
+            
+                // Update payment status to "pending" for all records associated with the session phone
+                $update_sql = "UPDATE cart SET quantity = '$quantity' WHERE phone_number = '$phone'";
+                if ($conn->query($update_sql) === TRUE) {
+                    echo "Payment status updated to 'pending' for all your ordered items.";
+                } else {
+                    echo "Error updating payment status: " . $conn->error;
+                }
+            
+                $conn->close();
+            }
+                
+
+            // Check if the user is logged in
+
+
             ?>
         </div>
         <a href="products.php" style="text-decoration: none;" class="back-btn">Back to Products</a>
 
-      
-        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+        <button type="button" class="btn btn-primary" id="checkoutBtn" data-toggle="modal" data-target="#exampleModal">
   Checkout
 </button>
+
 
 <!-- Modal -->
 <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -269,6 +313,28 @@ function check()
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+    $('#checkoutBtn').click(function() {
+        $.ajax({
+            url: 'update_payment.php', // PHP script to handle the update
+            type: 'POST',
+            data: { action: 'update_payment' }, // Send action parameter to identify the request
+            success: function(response) {
+                alert(response); // Show the response message
+            },
+            error: function(xhr, status, error) {
+                console.error(xhr.responseText);
+            }
+        });
+    });
+});
+</script>
+
+<script>
+
+    </script>
 
 </body>
 
