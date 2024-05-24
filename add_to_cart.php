@@ -1,120 +1,129 @@
 <?php
 session_start();
-$phone = $_SESSION['phone'];
 
-$quantity = " "; 
+// Check if the user is logged in
+if (!isset($_SESSION['phone'])) {
+    echo "Please log in to add items to the cart.";
+    exit;
+}
+
+$servername = "localhost";
+$username = "root";
+$password = "root";
+$dbname = "ecommerce";
+
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+$phone = $_SESSION['phone'];
+$client_name = $_SESSION['name'];
+$quantity = "";
+
+// Handle adding items to the cart or updating quantities
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $quantity = $_POST["quantity"];
+    if (isset($_POST['productId'], $_POST['quantity'], $_POST['phone'], $_POST['name'])) {
+        $product_id = $_POST['productId'];
+        $quantity = intval($_POST['quantity']);
+        $phone_number = $_POST['phone'];
+        $client_name = $_POST['name'];
+
+        // Check if the product is already in the cart for the user
+        $check_sql = "SELECT * FROM cart WHERE product_id = $product_id AND phone_number = '$phone_number' AND payment = 'pending' ";
+        $check_result = $conn->query($check_sql);
+
+        if ($check_result->num_rows > 0) {
+            // Update the quantity if the product is already in the cart
+            $update_sql = "UPDATE cart SET quantity = quantity + $quantity, name = '$client_name' WHERE product_id = $product_id AND phone_number = '$phone_number'";
+            if ($conn->query($update_sql) === TRUE) {
+              
+            } else {
+                echo "Error updating cart: " . $conn->error;
+            }
+        } else {
+            // Add the product to the cart
+            $insert_sql = "INSERT INTO cart (product_id, phone_number, name, quantity, payment, order_status , delivery_status) VALUES ($product_id, '$phone_number', '$client_name', $quantity, 'pending', 'pending', 'pending')";
+            if ($conn->query($insert_sql) === TRUE) {
+                
+            } else {
+                echo "Error adding product to cart: " . $conn->error;
+            }
+        }
+    } else if (isset($_POST['checkout'])) {
+        // Handle the checkout process
+        $update_sql = "UPDATE cart SET payment = 'checkout' WHERE phone_number = '$phone'";
+        if ($conn->query($update_sql) === TRUE) {
+           
+            echo "Order Placed ✅";
+       
+            exit();
+        } else {
+            echo "Error updating payment status: " . $conn->error;
+        }
+        exit();
+
+      
+    }
+
 
     
 }
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $quantity = $_POST["quantity"];
-    echo "Received quantity: " . $quantity;
-} else {
-    echo "No data received";
-}
-echo "Received quantity: " . $quantity;
-// Start the session to access session variables
-echo "Client_Id:", " ", $phone;
-echo "QUANTITY:", " ", $quantity;
 
+//echo "Client_Id: " . $phone;
+//echo " Client_Name: " . $client_name;
 
-
-
-  //  if (isset($_POST['quantity']) && isset($_POST['product_id'])) {
-    //$quantity = $_POST['quantity'];
-    //}
-// Check if product_id and phone are provided
-if (isset($_GET['product_id']) && isset($_GET['phone'])  && isset($_GET['phone']) ) {
-    // Connect to the database (update connection details as needed)
-    $servername = "localhost";
-    $username = "root";
-    $password = "root";
-    $dbname = "ecommerce";
-
-    $conn = new mysqli($servername, $username, $password, $dbname);
-
-    if ($conn->connect_error) {
-        die("Connection failed: " . $conn->connect_error);
-    }
-
-    $product_id = $_GET['product_id'];
-    $phone_number = $_GET['phone'];
-
-    // Check if the product is already in the cart for the user
-    // Check if the product is already in the cart for the user
-    $check_sql = "SELECT * FROM cart WHERE product_id = $product_id AND phone_number = '$phone_number'";
-    $check_result = $conn->query($check_sql);
-
-    if ($check_result->num_rows > 0) {
-        echo "Product already in cart.";
-    } else {
-        // Add the product to the cart
-        $insert_sql = "INSERT INTO cart (product_id, phone_number, quantity) VALUES ($product_id, '$phone_number', '$quantity' )";
-
-        if ($conn->query($insert_sql) === TRUE) {
-            echo "Product added to cart successfully.";
-        } else {
-            echo "Error adding product to cart: " . $conn->error;
-        }
-    }
-
-     echo "Received quantity: " . $quantity;
-
-    $conn->close();
-} else if (isset($_GET['remove_product_id'])) {
-    // Remove product from cart
+// Handle removing items from the cart
+if (isset($_GET['remove_product_id'])) {
     $remove_product_id = $_GET['remove_product_id'];
-
-    // Connect to the database (update connection details as needed)
-    $servername = "localhost";
-    $username = "root";
-    $password = "root";
-    $dbname = "ecommerce";
-
-    $conn = new mysqli($servername, $username, $password, $dbname);
-
-    if ($conn->connect_error) {
-        die("Connection failed: " . $conn->connect_error);
-    }
 
     // Delete the product from the cart
     $delete_sql = "DELETE FROM cart WHERE id = $remove_product_id AND phone_number = '$phone'";
     if ($conn->query($delete_sql) === TRUE) {
-      
+        echo "";
     } else {
         echo "Error removing product from cart: " . $conn->error;
     }
-
-    $conn->close();
 }
 
+// Calculate and display Cart Total
+$cart_sql = "SELECT products.price, cart.quantity FROM cart INNER JOIN products ON cart.product_id = products.id WHERE cart.phone_number = '$phone'  AND cart.payment = 'pending'";
+$cart_result = $conn->query($cart_sql);
 
+$cart_total = 0;
+$_SESSION['cart_total'] = $cart_total;
+if ($cart_result->num_rows > 0) {
+    while ($row = $cart_result->fetch_assoc()) {
+        $cart_total += ($row['price'] * $row['quantity']); // Calculate total for each item
+        $_SESSION['cart_total'] = $cart_total;
+    }
+}
 
-
-
+$conn->close();
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
+<title> Cart | Kun Rolls</title>
+<link rel="icon" href="kunrolltext.png" type="image/x-icon">
 <style>
         body {
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
-            margin: 0;
+         
             padding: 20px;
         }
 
         .container {
             max-width: 600px;
-            margin: 50px auto;
+            margin-top: 25px;
+     
             background-color: #fff;
             padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
         }
 
         h1 {
@@ -126,8 +135,23 @@ if (isset($_GET['product_id']) && isset($_GET['phone'])  && isset($_GET['phone']
             display: flex;
             align-items: center;
             margin-bottom: 10px;
+            
             border-bottom: 1px solid #ccc;
             padding-bottom: 10px;
+                 
+        
+            justify-content: space-between;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 20px;
+            transition: all 0.3s ease;
+            padding: 10px;
+        }
+
+        .cart-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border-radius: 20px;
         }
 
         .cart-item img {
@@ -135,10 +159,12 @@ if (isset($_GET['product_id']) && isset($_GET['phone'])  && isset($_GET['phone']
             height: auto;
             margin-right: 20px;
             border-radius: 5px;
+      
         }
 
         .product-details {
             flex-grow: 1;
+            
         }
 
         .quantity-select {
@@ -164,25 +190,28 @@ if (isset($_GET['product_id']) && isset($_GET['phone'])  && isset($_GET['phone']
             background-color: #0056b3;
         }
 
-
-
-
-
-
-
-
-
-
-
+        .cart-total {
+            margin-top: 20px;
+            font-size: 18px;
+        }
     </style>
-
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </head>
-
-<body>
-    <div class="container">
-        <h1>Add to Cart Response</h1>
+<body >
+<div class="container" >
+        <h1 style='font-weight: bold; color: #333; '><svg xmlns="http://www.w3.org/2000/svg" style="margin-top: -10px; " width="32" height="32" fill="currentColor" class="bi bi-bag" viewBox="0 0 16 16">
+  <path d="M8 1a2.5 2.5 0 0 1 2.5 2.5V4h-5v-.5A2.5 2.5 0 0 1 8 1m3.5 3v-.5a3.5 3.5 0 1 0-7 0V4H1v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V4zM2 5h12v9a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1z"/>
+</svg> CHECKOUT  BAG</h1>
+        <div class="cart-total" style='font-weight: bold; color: #333;   font-size: 20px;  '>
+            <?php
+            // Your PHP code for calculating and displaying Cart Total
+            echo "Cart Total: ₹" . $cart_total;
+            ?>
+            </br></br>
+        </div>
+        
+        
         <div class="message">
             <?php
             // Check if the user is logged in
@@ -201,141 +230,81 @@ if (isset($_GET['product_id']) && isset($_GET['phone'])  && isset($_GET['phone']
                 $phone_number = $_SESSION['phone'];
                 $cart_sql = "SELECT cart.id, products.product_name, products.price, products.product_image, cart.quantity 
                              FROM cart INNER JOIN products ON cart.product_id = products.id 
-                             WHERE cart.phone_number = '$phone_number'";
+                             WHERE cart.phone_number = '$phone_number' 
+                             AND payment='pending'";
                 $cart_result = $conn->query($cart_sql);
 
                 if ($cart_result->num_rows > 0) {
                     while ($row = $cart_result->fetch_assoc()) {
-                        echo "<div class='cart-item'>";
+                        echo "<div class='cart-item' style='display: flex; align-items: center;'>";
                         echo "<img src='" . $row['product_image'] . "' alt='Product Image'>";
                         echo "<div class='product-details'>";
-                        echo "<h3>" . $row['product_name'] . "</h3>";
-                        echo "<p>Price: ₹" . $row['price'] . "</p>";
-                        echo "<p>Quantity: " . $row['quantity'] . "</p>"; // Display quantity
-
+                        echo "<h3 style='font-weight: bold; color: #333; '>" . $row['product_name'] . "</h3>";
+                        echo "<p style='font-weight: bold; color: #333; '>Price: ₹" . $row['price'] . "</p>";
+                        echo "<p style='font-weight: bold; color: #333; '>Quantity: " . $row['quantity'] . "</p>"; // Display quantity
+                        
                         // Add remove item button with product_id as parameter
-                        echo "<a href='add_to_cart.php?remove_product_id=" . $row['id'] . "' class='btn btn-danger'>Remove</a>";
-
+                        echo "<a href='add_to_cart.php?remove_product_id=" . $row['id'] . "' class='btn btn-danger' style='margin-left: auto;'>Remove</a>";
+                        
                         echo "</div>";
                         echo "</div>";
+                        
                     }
                 } else {
-                    echo "<div class='empty-cart'>Your cart is empty.</div>";
+                    echo "<div class='empty-cart' style='font-weight: bold; color: #333; text-decoration:underline ; font-size: 16px;'>Your cart is empty.</div>";
                 }
 
                 $conn->close();
             } else {
                 echo "<div class='not-logged-in'>Please log in to view your cart.</div>";
             }
-
-            if ($_SERVER["REQUEST_METHOD"] == "POST") {
-                // Connect to the database (update connection details as needed)
-                $conn = new mysqli($servername, $username, $password, $dbname);
-            
-                if ($conn->connect_error) {
-                    die("Connection failed: " . $conn->connect_error);
-                }
-            
-                // Update payment status to "pending" for all records associated with the session phone
-                $update_sql = "UPDATE cart SET payment = 'pending' WHERE phone_number = '$phone'";
-                if ($conn->query($update_sql) === TRUE) {
-                    echo "Payment status updated to 'pending' for all your ordered items.";
-                } else {
-                    echo "Error updating payment status: " . $conn->error;
-                }
-            
-                $conn->close();
-            }
-
-
-            if ($_SERVER["REQUEST_METHOD"] == "POST") {
-                // Connect to the database (update connection details as needed)
-                $conn = new mysqli($servername, $username, $password, $dbname);
-            
-                if ($conn->connect_error) {
-                    die("Connection failed: " . $conn->connect_error);
-                }
-            
-                // Update payment status to "pending" for all records associated with the session phone
-                $update_sql = "UPDATE cart SET quantity = '$quantity' WHERE phone_number = '$phone'";
-                if ($conn->query($update_sql) === TRUE) {
-                    echo "Payment status updated to 'pending' for all your ordered items.";
-                } else {
-                    echo "Error updating payment status: " . $conn->error;
-                }
-            
-                $conn->close();
-            }
-                
-
-            // Check if the user is logged in
-
-
             ?>
         </div>
-        <a href="products.php" style="text-decoration: none;" class="back-btn">Back to Products</a>
+        <a href="products.php" style="text-decoration: none; padding: 8px 12px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer;" class="back-btn">Back to Products</a>
 
-        <button type="button" class="btn btn-primary" id="checkoutBtn" data-toggle="modal" data-target="#exampleModal">
-  Checkout
-</button>
+        <button type="button"  style="text-decoration: none; margin-top:-5px ; padding:6.5px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer;" class="btn btn-primary" id="checkoutBtn" data-toggle="modal" data-target="#exampleModal">Checkout</button>
 
-
-<!-- Modal -->
-<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Payment Mode</h5>
-
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-      <img src="g (1).png" alt="" width="100%" height="100%">
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary" onclick="check()" >Paid</button>
-      </div>
+        <!-- Modal -->
+  
     </div>
-  </div>
-</div>
 
-    </div>
-    <!-- Add your modal and script tags here -->
-<script>
+    <script>
+       
 
-function check()
-{
-    alert('Confirm Order Status With Cashier ✅')
-}
-</script>
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-$(document).ready(function() {
-    $('#checkoutBtn').click(function() {
-        $.ajax({
-            url: 'update_payment.php', // PHP script to handle the update
-            type: 'POST',
-            data: { action: 'update_payment' }, // Send action parameter to identify the request
-            success: function(response) {
-                alert(response); // Show the response message
-            },
-            error: function(xhr, status, error) {
-                console.error(xhr.responseText);
-            }
+        document.getElementById('checkoutBtn').addEventListener('click', function() {
+            fetch('add_to_cart.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'checkout=true',
+            })
+            .then(response => response.text())
+            .then(data => {
+                alert(data);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
         });
+    </script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    // Function to handle redirection after checkout button is clicked
+    function redirectToThankYouPage() {
+        window.location.href = "thankyou.php";
+    }
+
+    // Event listener for the checkout button
+    document.getElementById("checkoutBtn").addEventListener("click", function() {
+        // You can add additional logic here if needed
+        // For example, validation checks before redirecting
+
+        // Call the redirection function
+        redirectToThankYouPage();
     });
 });
 </script>
-
-<script>
-
-    </script>
-
 </body>
-
 </html>

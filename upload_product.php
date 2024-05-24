@@ -56,13 +56,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         body {
             font-family: Arial, sans-serif;
             margin: 0;
-            padding: 0;
+            padding: 00px;
             background-color: #f4f4f4;
         }
 
         .container {
             max-width: 1200px;
-            margin: 20px auto;
+            margin: 200px auto;
             padding: 20px;
             background-color: #fff;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -194,7 +194,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     </style>
 </head>
-<body>
+<body style="margin: 100px">
+
     <h1>Upload Product</h1>
     <form method="post">
     <label for="product_name">Product Name:</label>

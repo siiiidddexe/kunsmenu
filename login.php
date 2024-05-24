@@ -2,20 +2,18 @@
 session_start(); // Start the session to track logged-in users
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Check if phone number is provided
-    if (!empty($_POST['phone'])) {
-        // Store the phone number in a session variable
+    // Check if name and phone number are provided
+    if (!empty($_POST['name']) && !empty($_POST['phone'])) {
+        // Store the name and phone number in session variables
+        $_SESSION['name'] = $_POST['name'];
         $_SESSION['phone'] = $_POST['phone'];
         // Redirect the user to the products page
         header('Location: products.php');
         exit;
     } else {
-        $error = "Please enter your phone number.";
+        $error = "Please enter your name and phone number.";
     }
 }
-
-
-
 
 // Check if the form is submitted
 if (isset($_POST['phone'])) {
@@ -30,7 +28,6 @@ if (isset($_POST['phone'])) {
         $error = "Invalid phone number";  // Handle invalid login
     }
 }
-
 ?>
 
 <!DOCTYPE html>
@@ -38,7 +35,8 @@ if (isset($_POST['phone'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>Welcome | Kun Roll</title>
+    <link rel="icon" href="kunrolltext.png" type="image/x-icon">
 
     <style>
 
@@ -67,6 +65,7 @@ if (isset($_POST['phone'])) {
         h1 {
             margin-bottom: 20px;
             color: #333;
+            align-items: center;
         }
 
         label {
@@ -84,7 +83,14 @@ if (isset($_POST['phone'])) {
             border: 1px solid #ccc;
             box-sizing: border-box;
         }
-
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
         input[type="submit"] {
             width: 100%;
             padding: 10px;
@@ -115,13 +121,19 @@ if (isset($_POST['phone'])) {
                 transform: translateY(0);
             }
         }
+
+        
       
     </style>
 
 </head>
 <body>
-    <h1>Login</h1>
+    
     <form method="POST">
+    <div><img src="web-logo-02.png" alt="" width="300" height="100"></div>
+   
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required><br><br>
         <label for="phone">Phone Number:</label>
         <input type="tel" id="phone" name="phone" required><br><br>
         <input type="submit" value="Login">
