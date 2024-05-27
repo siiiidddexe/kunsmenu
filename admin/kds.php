@@ -1,3 +1,7 @@
+
+<?php include 'auth.php'; ?>
+
+
 <?php
 $servername = "localhost";
 $username = "root";
@@ -280,5 +284,17 @@ if ($result->num_rows > 0) {
             <?php endforeach; ?>
         <?php endif; ?>
     </div>
+
+    <script>
+        // Function to reload the page after 3 seconds
+        function autoRefreshPage() {
+            setTimeout(function() {
+                location.reload();
+            }, 2000); // 3000 milliseconds = 3 seconds
+        }
+
+        // Call the function when the page loads
+        window.onload = autoRefreshPage;
+    </script>
 </body>
 </html>

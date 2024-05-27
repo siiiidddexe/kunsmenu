@@ -2,6 +2,7 @@
 <?php include 'auth.php'; ?>
 
 
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -22,7 +23,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js" integrity="sha512-d9xgZrVZpmmQlfonhQUvTR7lMPtO7NkZMkA0ABN3PHCbKA5nqylQ/yWlFAyY6hYgdF1Qh6nYiuADWwKB4C2WSw=="
     crossorigin="anonymous"></script>
 
-    <style>
+<style>
 body {
   background-color: #fbfbfb;
 }
@@ -91,7 +92,7 @@ iframe {
           
           </a>
 
-          <a href="incoming.php" class="list-group-item list-group-item-action py-4 active " >
+          <a href="incoming.php" class="list-group-item list-group-item-action py-4  " >
             <i class="fa-solid fa-paper-plane fa-fw me-3"></i><span>Incoming Orders</span>
           
           </a>
@@ -106,7 +107,7 @@ iframe {
           </a>
 
           
-          <a href="salesview.php" class="list-group-item list-group-item-action py-4  " >
+          <a href="salesview.php" class="list-group-item list-group-item-action py-4 active  " >
             <i class="fas fa-chart-area fa-fw me-3"></i><span>Sales</span>
           </a>
 
@@ -198,10 +199,10 @@ iframe {
   <!--Main Navigation-->
 
   <!--Main layout-->
-  <main style="padding-top: 20px">
+  <main  >
     <div class="container-fluid"  >
       <!-- Your container content here -->
-      <iframe  src="orderstatus.php" ></iframe>
+      <iframe src="sales.php" style="padding-top: 10%; padding-bottom: 5%;" ></iframe>
     </div>
   </main>
   <!--Main layout-->

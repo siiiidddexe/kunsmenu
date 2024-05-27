@@ -2,13 +2,11 @@ body {
   background-color: #fbfbfb;
 }
 
-@media (min-width: 991.98px) {
+@media (min-width: 992px) {
   main {
     margin-left: 200px;
   }
 }
-
-
 
 /* Sidebar */
 .sidebar {

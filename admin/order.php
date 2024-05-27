@@ -1,5 +1,6 @@
 
-<?php ?>
+<?php include 'auth.php'; ?>
+
 
 
 <!DOCTYPE html>
@@ -21,7 +22,61 @@
   <link rel="stylesheet" href="css/admin.css" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js" integrity="sha512-d9xgZrVZpmmQlfonhQUvTR7lMPtO7NkZMkA0ABN3PHCbKA5nqylQ/yWlFAyY6hYgdF1Qh6nYiuADWwKB4C2WSw=="
     crossorigin="anonymous"></script>
-</head>
+
+<style>
+body {
+  background-color: #fbfbfb;
+}
+
+@media (min-width: 991.98px) {
+  main {
+    margin-left: 0px;
+  }
+}
+
+/* Sidebar */
+.sidebar {
+  position: fixed;
+  top: 0;
+ 
+  bottom: 0;
+  left: 0;
+  padding: 58px 0 0; /* Height of navbar */
+  box-shadow: 0 2px 5px 0 rgb(0 0 0 / 5%), 0 2px 10px 0 rgb(0 0 0 / 5%);
+  width: 240px;
+  z-index: 600;
+  background-color: #fff;
+}
+
+@media (max-width: 991.98px) {
+  .sidebar {
+    margin-top: 50px;
+    width: 100%;
+    position: relative;
+  }
+}
+.sidebar .active {
+  border-radius: 5px;
+  box-shadow: 0 2px 5px 0 rgb(0 0 0 / 16%), 0 2px 10px 0 rgb(0 0 0 / 12%);
+}
+
+.sidebar-sticky {
+  position: relative;
+  top: 0;
+  height: calc(100vh - 58px); /* Adjusted for navbar height */
+  padding-top: 0.5rem;
+  overflow-x: hidden;
+  overflow-y: auto; /* Scrollable contents if viewport is shorter than content. */
+}
+
+iframe {
+  width: 100%;
+  height: calc(100vh - 58px); /* Adjust the height as needed */
+  border: none; /* Remove iframe border */
+  overflow: hidden;
+}
+</style>
+  </head>
 
 <body style=" overflow: hidden">
   <!--Main Navigation-->
@@ -30,7 +85,7 @@
     <nav id="sidebarMenu" class="collapse d-lg-block sidebar collapse bg-white">
       <div class="position-sticky">
         <div class="list-group list-group-flush mx-3 mt-4">
-          <a href="index.php" class="list-group-item list-group-item-action py-4 " >
+          <a href="index.php" class="list-group-item list-group-item-action py-4  " >
             <i class="fa-solid fa-cart-shopping fa-fw me-3"></i><span>Place an Order</span>
           
           </a>
@@ -47,6 +102,15 @@
 
           <a href="order.php" class="list-group-item list-group-item-action py-4 active " >
             <i class="fas fa-chart-area fa-fw me-3"></i><span>Upload Product</span>
+          </a>
+
+          
+          <a href="salesview.php" class="list-group-item list-group-item-action py-4  " >
+            <i class="fas fa-chart-area fa-fw me-3"></i><span>Sales</span>
+          </a>
+
+          <a href="https://hpanel.hostinger.com/websites/kunmenu.com/redirect?l=phpMyAdmin&db_name=u807410800_ecommerce" class="list-group-item list-group-item-action py-4" >
+          <i class="fa-solid fa-database fa-fw me-3"> </i><span>Database</span>
           </a>
         </div>
       </div>

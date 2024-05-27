@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `ecommerce`
+-- Database: `u807410800_ecommerce`
 --
 
 -- --------------------------------------------------------
@@ -38,8 +38,7 @@ CREATE TABLE IF NOT EXISTS `cart` (
   `order_status` varchar(50) NOT NULL,
   `delivery_status` varchar(50) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=236 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
+) ENGINE=MyISAM AUTO_INCREMENT=236 DEFAULT  ;
 -- --------------------------------------------------------
 
 --
@@ -55,7 +54,7 @@ CREATE TABLE IF NOT EXISTS `products` (
   `product_image` varchar(255) DEFAULT NULL,
   `availability` varchar(255) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=6 DEFAULT ;
 
 --
 -- Dumping data for table `products`
@@ -76,11 +75,11 @@ INSERT INTO `products` (`id`, `product_name`, `price`, `discount`, `product_imag
 DROP TABLE IF EXISTS `users`;
 CREATE TABLE IF NOT EXISTS `users` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `full_name` varchar(128) COLLATE utf8mb4_general_ci NOT NULL,
-  `email` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `password` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `full_name` varchar(128)   NOT NULL,
+  `email` varchar(255)   NOT NULL,
+  `password` varchar(255)   NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT ;
 
 --
 -- Dumping data for table `users`

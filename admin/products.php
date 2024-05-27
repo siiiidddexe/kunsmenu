@@ -1,5 +1,7 @@
+<?php include 'auth.php'; ?>
+
 <?php
-session_start();
+
 $servername = "localhost";
 $username = "root";
 $password = "root";
@@ -11,10 +13,7 @@ if ($conn->connect_error) {
 }
 
 // Check if phone number is not set in session, redirect to login
-if (!isset($_SESSION['phone'])) {
-    header('Location: login.php');
-    exit;
-}
+
 
 $quantity = "";
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['quantity'])) {
@@ -23,7 +22,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['quantity'])) {
 
 if (isset($_POST['signout'])) {
     session_unset();
-    session_destroy();
+
     header('Location: login.php');
     exit;
 }

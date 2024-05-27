@@ -1,14 +1,15 @@
-<?php include 'auth.php'; ?>
+
 
 
 <?php
-
+session_start();
 require 'config.php'; // include your database connection settings
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    if (!empty($_POST['email']) && !empty($_POST['password'])) {
+    if (!empty($_POST['full_name']) && !empty($_POST['email']) && !empty($_POST['password'])) {
+        $full_name = $_POST['full_name'];
         $email = $_POST['email'];
-        $password = $_POST['password'];
+        $password = password_hash($_POST['password'], PASSWORD_DEFAULT); // hash the password
 
         // Create connection
         $conn = new mysqli(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_NAME);
@@ -18,37 +19,33 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             die("Connection failed: " . $conn->connect_error);
         }
 
-        // Prepare and bind
-        $stmt = $conn->prepare("SELECT id, full_name, password FROM users WHERE email = ?");
+        // Check if email already exists
+        $stmt = $conn->prepare("SELECT id FROM users WHERE email = ?");
         $stmt->bind_param("s", $email);
         $stmt->execute();
         $stmt->store_result();
 
-        // Check if the user exists
         if ($stmt->num_rows > 0) {
-            $stmt->bind_result($id, $full_name, $hashed_password);
-            $stmt->fetch();
+            $error = "Email already exists. Please use a different email.";
+        } else {
+            // Prepare and bind
+            $stmt = $conn->prepare("INSERT INTO users (full_name, email, password) VALUES (?, ?, ?)");
+            $stmt->bind_param("sss", $full_name, $email, $password);
 
-            // Verify password
-            if (password_verify($password, $hashed_password)) {
-                // Set session variables
-                $_SESSION['user_id'] = $id;
+            if ($stmt->execute()) {
+                $_SESSION['user_id'] = $stmt->insert_id;
                 $_SESSION['full_name'] = $full_name;
-
-                // Redirect to the protected page
                 header('Location: admin.php');
                 exit;
             } else {
-                $error = "Invalid email or password.";
+                $error = "Registration failed. Please try again.";
             }
-        } else {
-            $error = "Invalid email or password.";
         }
 
         $stmt->close();
         $conn->close();
     } else {
-        $error = "Please enter your email and password.";
+        $error = "Please fill in all fields.";
     }
 }
 ?>
@@ -58,7 +55,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login | Kun Roll</title>
+    <title>Register | Kun Roll</title>
     <link rel="icon" href="kunrolltext.png" type="image/x-icon">
     <style>
         body {
@@ -70,7 +67,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             min-height: 100vh;
             margin: 0;
         }
-        .login-container {
+        .register-container {
             max-width: 360px;
             width: 100%;
             padding: 40px;
@@ -90,7 +87,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             color: #555;
             font-weight: bold;
         }
-        input[type="email"], input[type="password"] {
+        input[type="text"], input[type="email"], input[type="password"] {
             width: 100%;
             padding: 10px;
             margin-bottom: 20px;
@@ -128,14 +125,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </style>
 </head>
 <body>
-    <div class="login-container">
-        <h1>Login</h1>
+    <div class="register-container">
+        <h1>Register</h1>
         <form method="POST" action="">
+            <label for="full_name">Full Name:</label>
+            <input type="text" id="full_name" name="full_name" required>
             <label for="email">Email:</label>
             <input type="email" id="email" name="email" required>
             <label for="password">Password:</label>
             <input type="password" id="password" name="password" required>
-            <input type="submit" value="Login">
+            <input type="submit" value="Register">
         </form>
         <?php
         if (isset($error)) {

@@ -1,6 +1,5 @@
 
-<?php include 'auth.php'; ?>
-
+<?php ?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -27,18 +26,15 @@ body {
   background-color: #fbfbfb;
 }
 
-@media (max-width: 991.98px) {
-  .sidebar {
-    margin-top: 50px;
-    width: 100%;
-    position: relative;
+@media (min-width: 991.98px) {
+  main {
+    margin-left: 0px;
   }
-}}
+}
 
 /* Sidebar */
 .sidebar {
   position: fixed;
-  margin-top: 50px;
   top: 0;
   bottom: 0;
   left: 0;
@@ -51,6 +47,7 @@ body {
 
 @media (max-width: 991.98px) {
   .sidebar {
+    margin-top: 50px;
     width: 100%;
     position: relative;
   }
@@ -86,12 +83,12 @@ iframe {
     <nav id="sidebarMenu" class="collapse d-lg-block sidebar collapse bg-white">
       <div class="position-sticky">
         <div class="list-group list-group-flush mx-3 mt-4">
-          <a href="index.php" class="list-group-item list-group-item-action py-4  " >
+          <a href="admin.php" class="list-group-item list-group-item-action py-4 active " >
             <i class="fa-solid fa-cart-shopping fa-fw me-3"></i><span>Place an Order</span>
           
           </a>
 
-          <a href="incoming.php" class="list-group-item list-group-item-action py-4 active " >
+          <a href="incoming.php" class="list-group-item list-group-item-action py-4  " >
             <i class="fa-solid fa-paper-plane fa-fw me-3"></i><span>Incoming Orders</span>
           
           </a>
@@ -129,7 +126,7 @@ iframe {
         </button>
 
         <!-- Brand -->
-        <a class="navbar-brand" href="index.php">
+        <a class="navbar-brand" href="admin.php">
             <img src="web-logo-02.png" height="50px" alt="" loading="lazy" />
         </a>
 
@@ -201,7 +198,7 @@ iframe {
   <main style="padding-top: 20px">
     <div class="container-fluid"  >
       <!-- Your container content here -->
-      <iframe  src="orderstatus.php" ></iframe>
+      <iframe  src="login.php" ></iframe>
     </div>
   </main>
   <!--Main layout-->
@@ -210,6 +207,7 @@ iframe {
   <script type="text/javascript" src="js/mdb.umd.min.js"></script>
   <!-- Custom scripts -->
   <script type="text/javascript" src="js/admin.js"></script>
+  
 </body>
 
 </html>

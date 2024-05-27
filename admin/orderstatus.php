@@ -1,3 +1,6 @@
+
+<?php include 'auth.php'; ?>
+
 <?php
 $servername = "localhost";
 $username = "root";
@@ -258,7 +261,7 @@ if ($result->num_rows > 0) {
         function autoRefreshPage() {
             setTimeout(function() {
                 location.reload();
-            }, 3000); // 3000 milliseconds = 3 seconds
+            }, 2000); // 3000 milliseconds = 3 seconds
         }
 
         // Call the function when the page loads
