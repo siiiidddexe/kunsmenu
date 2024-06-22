@@ -7,20 +7,16 @@ if (!isset($_SESSION['phone'])) {
     exit;
 }
 
-$servername = "localhost";
-$username = "root";
-$password = "root";
-$dbname = "ecommerce";
+include 'conn.php';
 
+// Establish a secure database connection
 $conn = new mysqli($servername, $username, $password, $dbname);
-
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
 $phone = $_SESSION['phone'];
 $client_name = $_SESSION['name'];
-$quantity = "";
 
 // Handle adding items to the cart or updating quantities
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -30,51 +26,61 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $phone_number = $_POST['phone'];
         $client_name = $_POST['name'];
 
-        // Check if the product is already in the cart for the user
-        $check_sql = "SELECT * FROM cart WHERE product_id = $product_id AND phone_number = '$phone_number' AND payment = 'pending' ";
-        $check_result = $conn->query($check_sql);
+        if ($quantity > 0) {
+            // Check if the product is already in the cart for the user
+            $check_sql = "SELECT * FROM cart WHERE product_id = ? AND phone_number = ? AND payment = 'pending'";
+            $stmt = $conn->prepare($check_sql);
+            $stmt->bind_param("is", $product_id, $phone_number);
+            $stmt->execute();
+            $check_result = $stmt->get_result();
 
-        if ($check_result->num_rows > 0) {
-            // Update the quantity if the product is already in the cart
-            $update_sql = "UPDATE cart SET quantity = quantity + $quantity, name = '$client_name' WHERE product_id = $product_id AND phone_number = '$phone_number'";
-            if ($conn->query($update_sql) === TRUE) {
-              
+            if ($check_result->num_rows > 0) {
+                // Update the quantity if the product is already in the cart
+                $update_sql = "UPDATE cart SET quantity = ?, name = ? WHERE product_id = ? AND phone_number = ?";
+                $stmt = $conn->prepare($update_sql);
+                $stmt->bind_param("isis", $quantity, $client_name, $product_id, $phone_number);
+                if ($stmt->execute() === TRUE) {
+                    echo "Cart updated successfully.";
+                } else {
+                    echo "Error updating cart: " . $conn->error;
+                }
             } else {
-                echo "Error updating cart: " . $conn->error;
+                // Add the product to the cart
+                $insert_sql = "INSERT INTO cart (product_id, phone_number, name, quantity, payment, order_status, delivery_status) VALUES (?, ?, ?, ?, 'pending', 'pending', 'pending')";
+                $stmt = $conn->prepare($insert_sql);
+                $stmt->bind_param("isss", $product_id, $phone_number, $client_name, $quantity);
+                if ($stmt->execute() === TRUE) {
+                    echo "Product added to cart successfully.";
+                } else {
+                    echo "Error adding product to cart: " . $conn->error;
+                }
             }
         } else {
-            // Add the product to the cart
-            $insert_sql = "INSERT INTO cart (product_id, phone_number, name, quantity, payment, order_status , delivery_status) VALUES ($product_id, '$phone_number', '$client_name', $quantity, 'pending', 'pending', 'pending')";
-            if ($conn->query($insert_sql) === TRUE) {
-                
+            // Remove the product from the cart if quantity is 0
+            $delete_sql = "DELETE FROM cart WHERE product_id = ? AND phone_number = ?";
+            $stmt = $conn->prepare($delete_sql);
+            $stmt->bind_param("is", $product_id, $phone_number);
+            if ($stmt->execute() === TRUE) {
+                echo "Product removed from cart.";
             } else {
-                echo "Error adding product to cart: " . $conn->error;
+                echo "Error removing product from cart: " . $conn->error;
             }
         }
     } else if (isset($_POST['checkout'])) {
         // Handle the checkout process
-        $update_sql = "UPDATE cart SET payment = 'checkout' WHERE phone_number = '$phone'";
-        if ($conn->query($update_sql) === TRUE) {
-           
-            echo "Order Placed ✅";
-       
+        $update_sql = "UPDATE cart SET payment = 'checkout' WHERE phone_number = ?";
+        $stmt = $conn->prepare($update_sql);
+        $stmt->bind_param("s", $phone);
+        if ($stmt->execute() === TRUE) {
+            echo "Order will be placed once you pay at cashier ✅";
             exit();
         } else {
             echo "Error updating payment status: " . $conn->error;
         }
         exit();
-
-      
     }
-
-
-    
 }
 
-//echo "Client_Id: " . $phone;
-//echo " Client_Name: " . $client_name;
-
-// Handle removing items from the cart
 if (isset($_GET['remove_product_id'])) {
     $remove_product_id = $_GET['remove_product_id'];
 
@@ -88,8 +94,11 @@ if (isset($_GET['remove_product_id'])) {
 }
 
 // Calculate and display Cart Total
-$cart_sql = "SELECT products.price, cart.quantity FROM cart INNER JOIN products ON cart.product_id = products.id WHERE cart.phone_number = '$phone'  AND cart.payment = 'pending'";
-$cart_result = $conn->query($cart_sql);
+$cart_sql = "SELECT products.price, cart.quantity FROM cart INNER JOIN products ON cart.product_id = products.id WHERE cart.phone_number = ? AND cart.payment = 'pending'";
+$stmt = $conn->prepare($cart_sql);
+$stmt->bind_param("s", $phone);
+$stmt->execute();
+$cart_result = $stmt->get_result();
 
 $cart_total = 0;
 $_SESSION['cart_total'] = $cart_total;
@@ -102,6 +111,7 @@ if ($cart_result->num_rows > 0) {
 
 $conn->close();
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -190,7 +200,6 @@ h1 {
     font-size: 20px; /* Increased font size */
     font-weight: bold;
 }
-
     </style>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
@@ -214,10 +223,14 @@ h1 {
             // Check if the user is logged in
             if (isset($_SESSION['phone'])) {
                 // Connect to the database
-                $servername = "localhost";
-                $username = "root";
-                $password = "root";
-                $dbname = "ecommerce";
+            
+
+                include 'conn.php';
+                
+                // Your remaining PHP code goes here...
+           
+                
+
                 $conn = new mysqli($servername, $username, $password, $dbname);
                 if ($conn->connect_error) {
                     die("Connection failed: " . $conn->connect_error);
@@ -290,7 +303,12 @@ h1 {
 document.addEventListener("DOMContentLoaded", function() {
     // Function to handle redirection after checkout button is clicked
     function redirectToThankYouPage() {
-        window.location.href = "thankyou.php";
+       alert("Order Will Be Placed Once You Pay at Cashier ✅");
+
+        setTimeout(function() {
+            
+            window.location.href = "thankyou.php";
+        }, 500);
     }
 
     // Event listener for the checkout button

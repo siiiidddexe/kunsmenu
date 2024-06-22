@@ -2,17 +2,19 @@
 
 <?php
 
+include 'conn.php';
+
+// Your remaining PHP code goes here...
+?>
+
+<?php
+
 
 // Check if the user is logged in
 if (!isset($_SESSION['phone'])) {
     echo "Please log in to add items to the cart.";
     exit;
 }
-
-$servername = "localhost";
-$username = "root";
-$password = "root";
-$dbname = "ecommerce";
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 
@@ -112,7 +114,7 @@ $conn->close();
 <title> Cart | Kun Rolls</title>
 <link rel="icon" href="kunrolltext.png" type="image/x-icon">
 <style>
-     body {
+    body {
     font-family: Arial, sans-serif;
     background-color: #f4f4f4;
     padding: 20px;
@@ -216,10 +218,12 @@ h1 {
             // Check if the user is logged in
             if (isset($_SESSION['phone'])) {
                 // Connect to the database
-                $servername = "localhost";
-                $username = "root";
-                $password = "root";
-                $dbname = "ecommerce";
+               
+              
+                include 'conn.php';
+                
+                // Your remaining PHP code goes here...
+             
                 $conn = new mysqli($servername, $username, $password, $dbname);
                 if ($conn->connect_error) {
                     die("Connection failed: " . $conn->connect_error);

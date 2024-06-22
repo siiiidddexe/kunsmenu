@@ -1,11 +1,14 @@
 
 <?php include 'auth.php'; ?>
+<?php
+
+include 'conn.php';
+
+// Your remaining PHP code goes here...
+?>
 
 <?php
-$servername = "localhost";
-$username = "root";
-$password = "root";
-$dbname = "ecommerce";
+
 
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
@@ -86,6 +89,7 @@ $product_sales_result = $conn->query($product_sales_sql);
 .container {
     max-width: 1200px;
     margin: 20px auto;
+    margin-bottom: 50px;
     padding: 20px;
     background-color: #fff;
     border-radius: 10px;

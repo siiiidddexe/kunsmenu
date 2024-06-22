@@ -1,8 +1,8 @@
-<?php include 'auth.php'; ?>
+
 
 
 <?php
-
+ session_start();
 require 'config.php'; // include your database connection settings
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -36,7 +36,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $_SESSION['full_name'] = $full_name;
 
                 // Redirect to the protected page
-                header('Location: admin.php');
+                header('Location: incoming.php');
                 exit;
             } else {
                 $error = "Invalid email or password.";
@@ -59,7 +59,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login | Kun Roll</title>
-    <link rel="icon" href="kunrolltext.png" type="image/x-icon">
+    <link rel="icon" href="../kunrolltext.png" type="image/x-icon">
     <style>
         body {
             font-family: Arial, sans-serif;

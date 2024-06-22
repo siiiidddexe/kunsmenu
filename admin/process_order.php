@@ -1,11 +1,14 @@
 
 <?php include 'auth.php'; ?>
+<?php
+
+include 'conn.php';
+
+// Your remaining PHP code goes here...
+?>
 
 <?php
-$servername = "localhost";
-$username = "root";
-$password = "root";
-$dbname = "ecommerce";
+
 
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);

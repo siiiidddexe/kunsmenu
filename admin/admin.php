@@ -1,5 +1,12 @@
 
-<?php ?>
+<?php include 'auth.php'; 
+ include "conn.php";
+$query = "SELECT COUNT(*) AS new_orders FROM cart WHERE order_status = 'pending'";
+$result = $conn->query($query);
+$row = $result->fetch_assoc();
+
+$new_orders = $row['new_orders'];
+?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -77,6 +84,32 @@ iframe {
   </head>
 
 <body style=" overflow: hidden">
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+      function checkNewOrders() {
+        fetch('check_new_orders.php')
+          .then(response => response.json())
+          .then(data => {
+            if (data.new_orders > 0) {
+              playSound();
+            }
+          })
+          .catch(error => console.error('Error:', error));
+      }
+
+      function playSound() {
+    setTimeout(() => {
+    const audio = new Audio('sound.mp3'); // Replace with the path to your sound file
+     // Loop the sound
+    audio.play();
+  }, 2000); // Delay of 1000 milliseconds (1 second)
+}
+
+
+      setInterval(checkNewOrders, 1000); // Check for new orders every 1 second
+    });
+  </script>
+
   <!--Main Navigation-->
   <header style="margin-bottom: 50px;">
     <!-- Sidebar -->
@@ -104,11 +137,15 @@ iframe {
 
           
           <a href="salesview.php" class="list-group-item list-group-item-action py-4  " >
-            <i class="fas fa-chart-area fa-fw me-3"></i><span>Sales</span>
+            <i class="fa-solid fa-money-check-dollar fa-fw me-3"></i><span>Sales</span>
           </a>
 
-          <a href="https://hpanel.hostinger.com/websites/kunmenu.com/redirect?l=phpMyAdmin&db_name=u807410800_ecommerce" class="list-group-item list-group-item-action py-4" >
+          <a href="https://hpanel.hostinger.com/redirect?l=phpMyAdmin&db_name=u807410800_ecommerce&domain=kunmenu.com" class="list-group-item list-group-item-action py-4" >
           <i class="fa-solid fa-database fa-fw me-3"> </i><span>Database</span>
+          </a>
+
+          <a href="logout.php" class="list-group-item list-group-item-action py-4" >
+          <i class="fa-solid fa-right-from-bracket fa-fw me-3"> </i><span>Logout</span>
           </a>
         </div>
       </div>
@@ -195,10 +232,10 @@ iframe {
   <!--Main Navigation-->
 
   <!--Main layout-->
-  <main style="padding-top: 20px">
+  <main style="margin-left: 0px; padding-top: 20px;">
     <div class="container-fluid"  >
       <!-- Your container content here -->
-      <iframe  src="login.php" ></iframe>
+      <iframe  src="login.php" style="padding-bottom:60px;" ></iframe>
     </div>
   </main>
   <!--Main layout-->

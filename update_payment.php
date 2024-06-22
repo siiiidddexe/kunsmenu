@@ -1,9 +1,12 @@
 <?php
 session_start();
-$servername = "localhost";
-$username = "root";
-$password = "root";
-$dbname = "ecommerce";
+
+
+include 'conn.php';
+
+// Your remaining PHP code goes here...
+
+
 $conn = new mysqli($servername, $username, $password, $dbname);
 
 if ($conn->connect_error) {

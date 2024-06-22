@@ -16,11 +16,13 @@ if (isset($_POST['product_id'], $_POST['quantity'], $_POST['phone'])) {
     $phone_number = $_POST['phone'];
 
     // Connect to the database (update connection details as needed)
-    $servername = "localhost";
-    $username = "root";
-    $password = "root";
-    $dbname = "ecommerce";
+    
 
+    include 'conn.php';
+    
+    // Your remaining PHP code goes here...
+ 
+    
     $conn = new mysqli($servername, $username, $password, $dbname);
 
     if ($conn->connect_error) {

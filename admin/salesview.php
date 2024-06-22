@@ -87,7 +87,7 @@ iframe {
     <nav id="sidebarMenu" class="collapse d-lg-block sidebar collapse bg-white">
       <div class="position-sticky">
         <div class="list-group list-group-flush mx-3 mt-4">
-          <a href="index.php" class="list-group-item list-group-item-action py-4  " >
+          <a href="admin.php" class="list-group-item list-group-item-action py-4  " >
             <i class="fa-solid fa-cart-shopping fa-fw me-3"></i><span>Place an Order</span>
           
           </a>
@@ -108,11 +108,15 @@ iframe {
 
           
           <a href="salesview.php" class="list-group-item list-group-item-action py-4 active  " >
-            <i class="fas fa-chart-area fa-fw me-3"></i><span>Sales</span>
+            <i class="fa-solid fa-money-check-dollar fa-fw me-3"></i><span>Sales</span>
           </a>
 
-          <a href="https://hpanel.hostinger.com/websites/kunmenu.com/redirect?l=phpMyAdmin&db_name=u807410800_ecommerce" class="list-group-item list-group-item-action py-4" >
+     <a href="https://hpanel.hostinger.com/redirect?l=phpMyAdmin&db_name=u807410800_ecommerce&domain=kunmenu.com" class="list-group-item list-group-item-action py-4" >
           <i class="fa-solid fa-database fa-fw me-3"> </i><span>Database</span>
+          </a>
+
+          <a href="logout.php" class="list-group-item list-group-item-action py-4" >
+          <i class="fa-solid fa-right-from-bracket fa-fw me-3"> </i><span>Logout</span>
           </a>
         </div>
       </div>
@@ -130,7 +134,7 @@ iframe {
         </button>
 
         <!-- Brand -->
-        <a class="navbar-brand" href="index.php">
+        <a class="navbar-brand" href="salesview.php">
             <img src="web-logo-02.png" height="50px" alt="" loading="lazy" />
         </a>
 
@@ -202,7 +206,7 @@ iframe {
   <main  >
     <div class="container-fluid"  >
       <!-- Your container content here -->
-      <iframe src="sales.php" style="padding-top: 10%; padding-bottom: 5%;" ></iframe>
+      <iframe src="sales.php"  ></iframe>
     </div>
   </main>
   <!--Main layout-->

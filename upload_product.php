@@ -1,9 +1,6 @@
 <?php
 // Connect to the database (update connection details as needed)
-$servername = "localhost";
-$username = "root";
-$password = "root";
-$dbname = "ecommerce";
+include 'conn.php';
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 
@@ -197,7 +194,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     </style>
 </head>
-<body style="padding : 25% ">
+<body style="padding-left : 20%; padding-right: 20%; padding-top:5%; ">
 
     <h1>Upload Product</h1>
     <form method="post">

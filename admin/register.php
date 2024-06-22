@@ -3,7 +3,7 @@
 
 <?php
 session_start();
-require 'config.php'; // include your database connection settings
+include 'config.php'; // include your database connection settings
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (!empty($_POST['full_name']) && !empty($_POST['email']) && !empty($_POST['password'])) {

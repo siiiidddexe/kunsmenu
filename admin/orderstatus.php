@@ -1,15 +1,13 @@
-
 <?php include 'auth.php'; ?>
+<?php
+include 'conn.php';
+
+// Your remaining PHP code goes here...
+?>
 
 <?php
-$servername = "localhost";
-$username = "root";
-$password = "root";
-$dbname = "ecommerce";
-
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
-
 // Check connection
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
@@ -60,8 +58,16 @@ if ($result->num_rows > 0) {
         ];
     }
 }
-?>
 
+// Ensure your database connection file is included
+
+// Query to check for new orders
+$query = "SELECT COUNT(*) AS new_orders FROM cart WHERE order_status = 'pending' AND payment = 'checkout'";
+$result = $conn->query($query);
+$row = $result->fetch_assoc();
+
+$new_orders = $row['new_orders'];
+?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -217,6 +223,13 @@ if ($result->num_rows > 0) {
     </style>
 </head>
 <body>
+<?php if ($new_orders > 0): ?>
+    <audio autoplay>
+      <source src="sound.mp3" type="audio/mpeg">
+      Your browser does not support the audio element.
+    </audio>
+  <?php endif; ?>
+
     <div class="container">
         <h1>Order Management</h1>
         <?php if (empty($orders)) : ?>
@@ -239,19 +252,18 @@ if ($result->num_rows > 0) {
                     </ul>
                     <p class="order-total">Order Total: ₹<?php echo $order_total; ?></p>
                     <p style=" font-weight: solid;">Status: <?php echo $order['order_status']; ?></p>
-   <div class="btn-group">
-    <form method="POST" style="display: flex;">
-        <input type="hidden" name="phone" value="<?php echo $phone; ?>">
-        <input type="hidden" name="status" value="accepted">
-        <button class="btn btn-accept" type="submit">Accept</button>
-    </form>
-    <form method="POST" style="display: flex;">
-        <input type="hidden" name="phone" value="<?php echo $phone; ?>">
-        <input type="hidden" name="status" value="rejected">
-        <button class="btn btn-reject" type="submit">Reject</button>
-    </form>
-</div>
-
+                    <div class="btn-group">
+                        <form method="POST" style="display: flex;">
+                            <input type="hidden" name="phone" value="<?php echo $phone; ?>">
+                            <input type="hidden" name="status" value="accepted">
+                            <button class="btn btn-accept" type="submit">Accept</button>
+                        </form>
+                        <form method="POST" style="display: flex;">
+                            <input type="hidden" name="phone" value="<?php echo $phone; ?>">
+                            <input type="hidden" name="status" value="rejected">
+                            <button class="btn btn-reject" type="submit">Reject</button>
+                        </form>
+                    </div>
                 </div>
             <?php endforeach; ?>
         <?php endif; ?>
@@ -266,6 +278,29 @@ if ($result->num_rows > 0) {
 
         // Call the function when the page loads
         window.onload = autoRefreshPage;
+    </script>
+    <!-- Include the audio element -->
+    <audio id="notificationSound">
+        <source src="sound.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+
+    <script>
+        // Function to play notification sound
+        function playNotificationSound() {
+            var audio = document.getElementById("notificationSound");
+            audio.play();
+        }
+
+        // Check if there are new orders and play the notification sound
+        var previousOrderCount = <?php echo count($orders); ?>;
+        setInterval(function() {
+            var currentOrderCount = <?php echo count($orders); ?>;
+            if (currentOrderCount > previousOrderCount) {
+                playNotificationSound();
+                previousOrderCount = currentOrderCount;
+            }
+        }, 5000); // Check every 5 seconds for new orders
     </script>
 </body>
 </html>

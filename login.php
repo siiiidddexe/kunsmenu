@@ -135,7 +135,9 @@ if (isset($_POST['phone'])) {
         <label for="name">Name:</label>
         <input type="text" id="name" name="name" required><br><br>
         <label for="phone">Phone Number:</label>
-        <input type="tel" id="phone" name="phone" required><br><br>
+            <input type="tel" id="phone" name="phone" required
+                pattern="\d{10}" minlength="10" maxlength="10"
+                title="Please enter exactly 10 digits">
         <input type="submit" value="Login">
     </form>
     <?php
